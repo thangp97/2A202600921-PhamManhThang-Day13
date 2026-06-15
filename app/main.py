@@ -6,8 +6,9 @@ from dotenv import load_dotenv
 
 load_dotenv()  # phải gọi trước khi Langfuse và các module khác được import
 
-from fastapi import FastAPI, HTTPException, Request
+from fastapi import FastAPI, HTTPException, Request, Response
 from fastapi.responses import JSONResponse
+from prometheus_client import CONTENT_TYPE_LATEST
 from structlog.contextvars import bind_contextvars
 
 from .agent import LabAgent
@@ -51,6 +52,13 @@ async def health() -> dict:
 @app.get("/metrics")
 async def metrics() -> dict:
     return snapshot()
+
+
+@app.get("/metrics/prometheus")
+async def metrics_prometheus() -> Response:
+    from .metrics_prom import render_prometheus
+
+    return Response(content=render_prometheus(), media_type=CONTENT_TYPE_LATEST)
 
 
 @app.post("/chat", response_model=ChatResponse)
