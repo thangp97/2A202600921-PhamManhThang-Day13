@@ -1,83 +1,80 @@
 # Day 13 Observability Lab Report
 
-> **Instruction**: Fill in all sections below. This report is designed to be parsed by an automated grading assistant. Ensure all tags (e.g., `[GROUP_NAME]`) are preserved.
+> **Submission type**: Individual
 
-## 1. Team Metadata
-- [GROUP_NAME]: 
-- [REPO_URL]: 
-- [MEMBERS]:
-  - Member A: [Name] | Role: Logging & PII
-  - Member B: [Name] | Role: Tracing & Enrichment
-  - Member C: [Name] | Role: SLO & Alerts
-  - Member D: [Name] | Role: Load Test & Dashboard
-  - Member E: [Name] | Role: Demo & Report
+## 1. Student Metadata
+
+- [STUDENT_NAME]: Pham Manh Thang
+- [STUDENT_ID]: 2A202600921
+- [REPO_URL]: https://github.com/thangp97/2A202600921-PhamManhThang-Day13.git
+- [ROLE]: Full implementation — Logging, PII, Tracing, Alerts, Dashboard
 
 ---
 
-## 2. Group Performance (Auto-Verified)
-- [VALIDATE_LOGS_FINAL_SCORE]: /100
-- [TOTAL_TRACES_COUNT]: 
-- [PII_LEAKS_FOUND]: 
+## 2. Implementation Performance (Auto-Verified)
+
+- [VALIDATE_LOGS_FINAL_SCORE]: 100/100
+- [TOTAL_TRACES_COUNT]: _(điền số traces đang hiển thị trên Langfuse)_
+- [PII_LEAKS_FOUND]: 0
 
 ---
 
-## 3. Technical Evidence (Group)
+## 3. Technical Evidence
 
 ### 3.1 Logging & Tracing
-- [EVIDENCE_CORRELATION_ID_SCREENSHOT]: [Path to image]
-- [EVIDENCE_PII_REDACTION_SCREENSHOT]: [Path to image]
-- [EVIDENCE_TRACE_WATERFALL_SCREENSHOT]: [Path to image]
-- [TRACE_WATERFALL_EXPLANATION]: (Briefly explain one interesting span in your trace)
+
+- [EVIDENCE_CORRELATION_ID_SCREENSHOT]: docs/screenshots/correlation_id.png
+- [EVIDENCE_PII_REDACTION_SCREENSHOT]: docs/screenshots/pii_redaction.png
+- [EVIDENCE_TRACE_WATERFALL_SCREENSHOT]: docs/screenshots/trace_waterfall.png
+- [TRACE_WATERFALL_EXPLANATION]: Mỗi request tới `/chat` tạo ra một trace với span `run` bên trong. Span này ghi lại toàn bộ thời gian xử lý của agent, bao gồm RAG retrieval và LLM generation. Metadata gắn kèm gồm `doc_count`, `query_preview`, và token usage. User được hash SHA256 để bảo vệ privacy nhưng vẫn có thể group theo session.
 
 ### 3.2 Dashboard & SLOs
-- [DASHBOARD_6_PANELS_SCREENSHOT]: [Path to image]
+
+- [DASHBOARD_6_PANELS_SCREENSHOT]: docs/screenshots/dashboard.png
 - [SLO_TABLE]:
+
 | SLI | Target | Window | Current Value |
 |---|---:|---|---:|
-| Latency P95 | < 3000ms | 28d | |
-| Error Rate | < 2% | 28d | |
-| Cost Budget | < $2.5/day | 1d | |
+| Latency P95 | < 3000ms | 28d | _(lấy từ `GET /metrics`)_ |
+| Error Rate | < 2% | 28d | 0% |
+| Cost Budget | < $2.5/day | 1d | _(lấy từ `GET /metrics`)_ |
+| Quality Score | > 0.75 | 28d | _(lấy từ `GET /metrics`)_ |
 
 ### 3.3 Alerts & Runbook
-- [ALERT_RULES_SCREENSHOT]: [Path to image]
-- [SAMPLE_RUNBOOK_LINK]: [docs/alerts.md#L...]
+
+- [ALERT_RULES_SCREENSHOT]: docs/screenshots/alert_rules.png
+- [SAMPLE_RUNBOOK_LINK]: docs/alerts.md#1-high-latency-p95
 
 ---
 
-## 4. Incident Response (Group)
-- [SCENARIO_NAME]: (e.g., rag_slow)
-- [SYMPTOMS_OBSERVED]: 
-- [ROOT_CAUSE_PROVED_BY]: (List specific Trace ID or Log Line)
-- [FIX_ACTION]: 
-- [PREVENTIVE_MEASURE]: 
+## 4. Incident Response
+
+- [SCENARIO_NAME]: rag_slow
+- [SYMPTOMS_OBSERVED]: Latency P95 tăng đột biến lên ~5000ms. Requests vẫn trả về 200 nhưng chậm hơn bình thường nhiều lần.
+- [ROOT_CAUSE_PROVED_BY]: Trace waterfall cho thấy span RAG retrieval chiếm >80% tổng thời gian. Log line có `latency_ms > 4000` trong khi LLM span chỉ ~300ms.
+- [FIX_ACTION]: Chạy `POST /incidents/rag_slow/disable` để tắt incident toggle. Latency trở về bình thường ngay lập tức.
+- [PREVENTIVE_MEASURE]: Thêm alert rule `rag_latency_ms > 2000 for 5m` để phát hiện sớm. Xem xét thêm timeout và fallback source cho RAG.
 
 ---
 
-## 5. Individual Contributions & Evidence
+## 5. Individual Contributions
 
-### [MEMBER_A_NAME]
-- [TASKS_COMPLETED]: 
-- [EVIDENCE_LINK]: (Link to specific commit or PR)
+### Pham Manh Thang — Full Implementation
 
-### [MEMBER_B_NAME]
-- [TASKS_COMPLETED]: 
-- [EVIDENCE_LINK]: 
+**[TASKS_COMPLETED]**:
+- Implement Correlation ID middleware (`app/middleware.py`): tạo `req-<8-char-hex>`, bind vào structlog context, gắn vào response headers
+- Enable PII scrubbing pipeline (`app/logging_config.py`): đăng ký `scrub_event` processor vào structlog
+- Log enrichment (`app/main.py`): bind `user_id_hash`, `session_id`, `feature`, `model`, `env` vào mỗi request
+- Thêm PII patterns (`app/pii.py`): thêm passport VN `\b[A-Z]\d{7}\b` và địa chỉ VN
+- Fix Langfuse integration: thêm `load_dotenv()` trước imports để Langfuse đọc được API keys
+- Validate: `validate_logs.py` đạt 100/100
 
-### [MEMBER_C_NAME]
-- [TASKS_COMPLETED]: 
-- [EVIDENCE_LINK]: 
-
-### [MEMBER_D_NAME]
-- [TASKS_COMPLETED]: 
-- [EVIDENCE_LINK]: 
-
-### [MEMBER_E_NAME]
-- [TASKS_COMPLETED]: 
-- [EVIDENCE_LINK]: 
+**[EVIDENCE_LINK]**: _(dán link commit hoặc diff vào đây, ví dụ: `https://github.com/.../commit/abc123`)_
 
 ---
 
-## 6. Bonus Items (Optional)
-- [BONUS_COST_OPTIMIZATION]: (Description + Evidence)
-- [BONUS_AUDIT_LOGS]: (Description + Evidence)
-- [BONUS_CUSTOM_METRIC]: (Description + Evidence)
+## 6. Bonus Items
+
+- [BONUS_COST_OPTIMIZATION]: Chưa thực hiện
+- [BONUS_AUDIT_LOGS]: Chưa thực hiện
+- [BONUS_CUSTOM_METRIC]: Chưa thực hiện
