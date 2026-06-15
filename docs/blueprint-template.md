@@ -14,7 +14,7 @@
 ## 2. Implementation Performance (Auto-Verified)
 
 - [VALIDATE_LOGS_FINAL_SCORE]: 100/100
-- [TOTAL_TRACES_COUNT]: _(điền số traces đang hiển thị trên Langfuse)_
+- [TOTAL_TRACES_COUNT]: 122
 - [PII_LEAKS_FOUND]: 0
 
 ---
@@ -35,10 +35,10 @@
 
 | SLI | Target | Window | Current Value |
 |---|---:|---|---:|
-| Latency P95 | < 3000ms | 28d | _(lấy từ `GET /metrics`)_ |
+| Latency P95 | < 3000ms | 28d | 2651ms |
 | Error Rate | < 2% | 28d | 0% |
-| Cost Budget | < $2.5/day | 1d | _(lấy từ `GET /metrics`)_ |
-| Quality Score | > 0.75 | 28d | _(lấy từ `GET /metrics`)_ |
+| Cost Budget | < $2.5/day | 1d | $0.0422 total ($0.0021/req) |
+| Quality Score | > 0.75 | 28d | 0.88 |
 
 ### 3.3 Alerts & Runbook
 
@@ -69,7 +69,7 @@
 - Fix Langfuse integration: thêm `load_dotenv()` trước imports để Langfuse đọc được API keys
 - Validate: `validate_logs.py` đạt 100/100
 
-**[EVIDENCE_LINK]**: _(dán link commit hoặc diff vào đây, ví dụ: `https://github.com/.../commit/abc123`)_
+**[EVIDENCE_LINK]**: https://github.com/thangp97/2A202600921-PhamManhThang-Day13/commits/main
 
 ---
 
