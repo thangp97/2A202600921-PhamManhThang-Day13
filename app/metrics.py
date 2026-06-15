@@ -10,9 +10,17 @@ REQUEST_TOKENS_OUT: list[int] = []
 ERRORS: Counter[str] = Counter()
 TRAFFIC: int = 0
 QUALITY_SCORES: list[float] = []
+REQUESTS_BY_MODEL: Counter[str] = Counter()  # custom metric: phân bổ request theo model
 
 
-def record_request(latency_ms: int, cost_usd: float, tokens_in: int, tokens_out: int, quality_score: float) -> None:
+def record_request(
+    latency_ms: int,
+    cost_usd: float,
+    tokens_in: int,
+    tokens_out: int,
+    quality_score: float,
+    model: str = "unknown",
+) -> None:
     global TRAFFIC
     TRAFFIC += 1
     REQUEST_LATENCIES.append(latency_ms)
@@ -20,6 +28,7 @@ def record_request(latency_ms: int, cost_usd: float, tokens_in: int, tokens_out:
     REQUEST_TOKENS_IN.append(tokens_in)
     REQUEST_TOKENS_OUT.append(tokens_out)
     QUALITY_SCORES.append(quality_score)
+    REQUESTS_BY_MODEL[model] += 1
 
 
 
@@ -49,4 +58,5 @@ def snapshot() -> dict:
         "tokens_out_total": sum(REQUEST_TOKENS_OUT),
         "error_breakdown": dict(ERRORS),
         "quality_avg": round(mean(QUALITY_SCORES), 4) if QUALITY_SCORES else 0.0,
+        "requests_by_model": dict(REQUESTS_BY_MODEL),
     }

@@ -19,6 +19,7 @@ _COST_TOTAL = Gauge("lab_cost_usd_total", "Cumulative cost in USD")
 _COST_AVG = Gauge("lab_cost_usd_avg", "Average cost per request in USD")
 _TOKENS = Gauge("lab_tokens_total", "Total tokens", ["direction"])
 _QUALITY = Gauge("lab_quality_score_avg", "Average heuristic quality score")
+_REQUESTS_BY_MODEL = Gauge("lab_requests_by_model", "Requests grouped by model", ["model"])
 
 
 def render_prometheus() -> bytes:
@@ -42,5 +43,8 @@ def render_prometheus() -> bytes:
     _TOKENS.labels(direction="in").set(snap["tokens_in_total"])
     _TOKENS.labels(direction="out").set(snap["tokens_out_total"])
     _QUALITY.set(snap["quality_avg"])
+
+    for model, count in snap["requests_by_model"].items():
+        _REQUESTS_BY_MODEL.labels(model=model).set(count)
 
     return generate_latest(REGISTRY)

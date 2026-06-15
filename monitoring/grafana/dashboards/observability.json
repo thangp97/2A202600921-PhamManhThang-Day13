@@ -161,6 +161,23 @@
       "targets": [
         { "refId": "A", "expr": "lab_quality_score_avg", "legendFormat": "quality avg" }
       ]
+    },
+    {
+      "id": 7,
+      "title": "7. Requests by Model (custom metric, cost routing)",
+      "type": "piechart",
+      "gridPos": { "h": 8, "w": 12, "x": 0, "y": 24 },
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "fieldConfig": {
+        "defaults": { "unit": "short" }
+      },
+      "options": {
+        "legend": { "displayMode": "table", "placement": "right", "values": ["value", "percent"] },
+        "pieType": "donut"
+      },
+      "targets": [
+        { "refId": "A", "expr": "lab_requests_by_model", "legendFormat": "{{model}}", "instant": true }
+      ]
     }
   ]
 }
