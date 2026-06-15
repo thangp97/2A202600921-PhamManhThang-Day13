@@ -1,0 +1,166 @@
+{
+  "annotations": { "list": [] },
+  "editable": true,
+  "fiscalYearStartMonth": 0,
+  "graphTooltip": 1,
+  "links": [],
+  "liveNow": false,
+  "refresh": "15s",
+  "schemaVersion": 39,
+  "tags": ["day13", "observability-lab"],
+  "time": { "from": "now-1h", "to": "now" },
+  "timepicker": {},
+  "timezone": "",
+  "title": "Day 13 Observability Lab",
+  "uid": "day13-obs-lab",
+  "version": 1,
+  "panels": [
+    {
+      "id": 1,
+      "title": "1. Latency P50/P95/P99",
+      "type": "timeseries",
+      "gridPos": { "h": 8, "w": 12, "x": 0, "y": 0 },
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "ms",
+          "custom": {
+            "drawStyle": "line",
+            "fillOpacity": 10,
+            "thresholdsStyle": { "mode": "line" }
+          },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              { "color": "green", "value": null },
+              { "color": "red", "value": 3000 }
+            ]
+          }
+        }
+      },
+      "targets": [
+        { "refId": "A", "expr": "lab_latency_ms{quantile=\"p50\"}", "legendFormat": "P50" },
+        { "refId": "B", "expr": "lab_latency_ms{quantile=\"p95\"}", "legendFormat": "P95" },
+        { "refId": "C", "expr": "lab_latency_ms{quantile=\"p99\"}", "legendFormat": "P99" }
+      ]
+    },
+    {
+      "id": 2,
+      "title": "2. Traffic (total requests)",
+      "type": "timeseries",
+      "gridPos": { "h": 8, "w": 12, "x": 12, "y": 0 },
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "short",
+          "custom": { "drawStyle": "line", "fillOpacity": 20 }
+        }
+      },
+      "targets": [
+        { "refId": "A", "expr": "lab_traffic_total", "legendFormat": "requests" }
+      ]
+    },
+    {
+      "id": 3,
+      "title": "3. Error Rate (% with breakdown)",
+      "type": "timeseries",
+      "gridPos": { "h": 8, "w": 12, "x": 0, "y": 8 },
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "percent",
+          "custom": {
+            "drawStyle": "line",
+            "fillOpacity": 10,
+            "thresholdsStyle": { "mode": "line" }
+          },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              { "color": "green", "value": null },
+              { "color": "red", "value": 2 }
+            ]
+          }
+        }
+      },
+      "targets": [
+        { "refId": "A", "expr": "lab_error_rate_pct", "legendFormat": "error rate %" },
+        { "refId": "B", "expr": "lab_errors_total", "legendFormat": "{{type}}" }
+      ]
+    },
+    {
+      "id": 4,
+      "title": "4. Cost over time (USD)",
+      "type": "timeseries",
+      "gridPos": { "h": 8, "w": 12, "x": 12, "y": 8 },
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "currencyUSD",
+          "custom": {
+            "drawStyle": "line",
+            "fillOpacity": 10,
+            "thresholdsStyle": { "mode": "line" }
+          },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              { "color": "green", "value": null },
+              { "color": "red", "value": 2.5 }
+            ]
+          }
+        }
+      },
+      "targets": [
+        { "refId": "A", "expr": "lab_cost_usd_total", "legendFormat": "total cost" },
+        { "refId": "B", "expr": "lab_cost_usd_avg", "legendFormat": "avg cost/req" }
+      ]
+    },
+    {
+      "id": 5,
+      "title": "5. Tokens in/out",
+      "type": "timeseries",
+      "gridPos": { "h": 8, "w": 12, "x": 0, "y": 16 },
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "short",
+          "custom": { "drawStyle": "line", "fillOpacity": 10 }
+        }
+      },
+      "targets": [
+        { "refId": "A", "expr": "lab_tokens_total{direction=\"in\"}", "legendFormat": "tokens in" },
+        { "refId": "B", "expr": "lab_tokens_total{direction=\"out\"}", "legendFormat": "tokens out" }
+      ]
+    },
+    {
+      "id": 6,
+      "title": "6. Quality Score (avg, SLO 0.75)",
+      "type": "timeseries",
+      "gridPos": { "h": 8, "w": 12, "x": 12, "y": 16 },
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "short",
+          "min": 0,
+          "max": 1,
+          "custom": {
+            "drawStyle": "line",
+            "fillOpacity": 10,
+            "thresholdsStyle": { "mode": "line" }
+          },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              { "color": "red", "value": null },
+              { "color": "green", "value": 0.75 }
+            ]
+          }
+        }
+      },
+      "targets": [
+        { "refId": "A", "expr": "lab_quality_score_avg", "legendFormat": "quality avg" }
+      ]
+    }
+  ]
+}
