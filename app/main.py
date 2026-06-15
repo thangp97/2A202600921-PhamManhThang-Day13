@@ -12,6 +12,7 @@ from prometheus_client import CONTENT_TYPE_LATEST
 from structlog.contextvars import bind_contextvars
 
 from .agent import LabAgent
+from .audit import audit_log
 from .incidents import disable, enable, status
 from .logging_config import configure_logging, get_logger
 from .metrics import record_error, snapshot
@@ -91,6 +92,17 @@ async def chat(request: Request, body: ChatRequest) -> ChatResponse:
             tokens_out=result.tokens_out,
             cost_usd=result.cost_usd,
             payload={"answer_preview": summarize_text(result.answer)},
+        )
+        audit_log(
+            "agent_invoked",
+            correlation_id=request.state.correlation_id,
+            user_id_hash=hash_user_id(body.user_id),
+            session_id=body.session_id,
+            feature=body.feature,
+            model=agent.model,
+            tokens_in=result.tokens_in,
+            tokens_out=result.tokens_out,
+            cost_usd=result.cost_usd,
         )
         return ChatResponse(
             answer=result.answer,

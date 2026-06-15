@@ -76,5 +76,5 @@
 ## 6. Bonus Items
 
 - [BONUS_COST_OPTIMIZATION]: Chưa thực hiện
-- [BONUS_AUDIT_LOGS]: Chưa thực hiện
+- [BONUS_AUDIT_LOGS]: Audit log tách riêng tại `data/audit.jsonl` (module `app/audit.py`). Mỗi request `/chat` ghi một bản ghi `agent_invoked` chỉ chứa metadata an toàn (user_id_hash, session_id, feature, model, tokens, cost) — không ghi message gốc hay user_id thật để tránh PII. Tách khỏi application log để giữ lâu dài phục vụ compliance.
 - [BONUS_CUSTOM_METRIC]: Chưa thực hiện
