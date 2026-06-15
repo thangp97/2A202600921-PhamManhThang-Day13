@@ -64,14 +64,16 @@ async def metrics_prometheus() -> Response:
 
 @app.post("/chat", response_model=ChatResponse)
 async def chat(request: Request, body: ChatRequest) -> ChatResponse:
+    # Cost optimization: chọn model phù hợp trước, rồi log đúng model thực dùng.
+    chosen_model = agent.pick_model(body.feature, body.message)
     bind_contextvars(
         user_id_hash=hash_user_id(body.user_id),
         session_id=body.session_id,
         feature=body.feature,
-        model=agent.model,
+        model=chosen_model,
         env=os.getenv("APP_ENV", "dev"),
     )
-    
+
     log.info(
         "request_received",
         service="api",
@@ -83,6 +85,7 @@ async def chat(request: Request, body: ChatRequest) -> ChatResponse:
             feature=body.feature,
             session_id=body.session_id,
             message=body.message,
+            model=chosen_model,
         )
         log.info(
             "response_sent",
@@ -99,7 +102,7 @@ async def chat(request: Request, body: ChatRequest) -> ChatResponse:
             user_id_hash=hash_user_id(body.user_id),
             session_id=body.session_id,
             feature=body.feature,
-            model=agent.model,
+            model=chosen_model,
             tokens_in=result.tokens_in,
             tokens_out=result.tokens_out,
             cost_usd=result.cost_usd,
