@@ -24,13 +24,24 @@
 ### 3.1 Logging & Tracing
 
 - [EVIDENCE_CORRELATION_ID_SCREENSHOT]: docs/screenshots/correlation_id.png
+
+![Correlation ID](screenshots/correlation_id.png)
+
 - [EVIDENCE_PII_REDACTION_SCREENSHOT]: docs/screenshots/pii_redaction.png
+
+![PII Redaction](screenshots/pii_redaction.png)
+
 - [EVIDENCE_TRACE_WATERFALL_SCREENSHOT]: docs/screenshots/trace_waterfall.png
+
+![Trace Waterfall](screenshots/trace_waterfall.png)
 - [TRACE_WATERFALL_EXPLANATION]: Mỗi request tới `/chat` tạo ra một trace với span `run` bên trong. Span này ghi lại toàn bộ thời gian xử lý của agent, bao gồm RAG retrieval và LLM generation. Metadata gắn kèm gồm `doc_count`, `query_preview`, và token usage. User được hash SHA256 để bảo vệ privacy nhưng vẫn có thể group theo session.
 
 ### 3.2 Dashboard & SLOs
 
 - [DASHBOARD_6_PANELS_SCREENSHOT]: docs/screenshots/dashboard.png
+
+![Dashboard 6 Panels](screenshots/dashboard.png)
+
 - [SLO_TABLE]:
 
 | SLI | Target | Window | Current Value |
@@ -43,6 +54,9 @@
 ### 3.3 Alerts & Runbook
 
 - [ALERT_RULES_SCREENSHOT]: docs/screenshots/alert_rules.png
+
+![Alert Rules](screenshots/alert_rules.png)
+
 - [SAMPLE_RUNBOOK_LINK]: docs/alerts.md#1-high-latency-p95
 
 ---
@@ -75,6 +89,6 @@
 
 ## 6. Bonus Items
 
-- [BONUS_COST_OPTIMIZATION]: Chưa thực hiện
+- [BONUS_COST_OPTIMIZATION]: Áp dụng model routing trong `app/agent.py` (`pick_model`): route tác vụ nhẹ (feature `summary` hoặc câu hỏi < 60 ký tự) sang Haiku ($0.8/$4 per 1M) thay vì Sonnet ($3/$15 per 1M). Đo bằng `python -m scripts.cost_report` trên 10 câu hỏi mẫu: **BEFORE (all Sonnet) ≈ $0.0232 → AFTER (routing) ≈ $0.0099, tiết kiệm ~57%** (8/10 request route sang Haiku).
 - [BONUS_AUDIT_LOGS]: Audit log tách riêng tại `data/audit.jsonl` (module `app/audit.py`). Mỗi request `/chat` ghi một bản ghi `agent_invoked` chỉ chứa metadata an toàn (user_id_hash, session_id, feature, model, tokens, cost) — không ghi message gốc hay user_id thật để tránh PII. Tách khỏi application log để giữ lâu dài phục vụ compliance.
-- [BONUS_CUSTOM_METRIC]: Chưa thực hiện
+- [BONUS_CUSTOM_METRIC]: Thêm custom metric `lab_requests_by_model` (đếm request theo từng model) trong `app/metrics.py` + expose qua `/metrics/prometheus`. Hiển thị ở Grafana panel 7 (donut chart) — chứng minh trực quan cost routing đang phân bổ traffic giữa Sonnet và Haiku.
